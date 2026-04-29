@@ -1,151 +1,136 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'user.dart';
 
-void main() {
-  runApp(const JokeApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(UserAdapter());
+  await Hive.openBox<User>('users');
+
+  runApp(MyApp());
 }
 
-class JokeApp extends StatelessWidget {
-  const JokeApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: JokeHome(),
+      home: HomeScreen(),
     );
   }
 }
 
-class JokeHome extends StatefulWidget {
-  const JokeHome({super.key});
-
+class HomeScreen extends StatefulWidget {
   @override
-  State<JokeHome> createState() => _JokeHomeState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _JokeHomeState extends State<JokeHome> {
-  String setup = "";
-  String punchline = "";
-  bool isLoading = false;
-  bool showAnswer = false;
+class _HomeScreenState extends State<HomeScreen> {
+  final nameController = TextEditingController();
+  final ageController = TextEditingController();
 
-  Future<void> fetchJoke() async {
-    setState(() {
-      isLoading = true;
-      showAnswer = false;
-    });
-
-    final response = await http.get(
-      Uri.parse("https://official-joke-api.appspot.com/jokes/random"),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        setup = data["setup"];
-        punchline = data["punchline"];
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+  late Box<User> userBox;
 
   @override
   void initState() {
     super.initState();
-    fetchJoke();
+    userBox = Hive.box<User>('users');
+  }
+
+  // CREATE
+  void addUser() {
+    final user = User(
+      name: nameController.text,
+      age: int.parse(ageController.text),
+    );
+    userBox.add(user);
+    nameController.clear();
+    ageController.clear();
+    setState(() {});
+  }
+
+  // UPDATE
+  void updateUser(int index) {
+    final user = userBox.getAt(index);
+    user!.name = nameController.text;
+    user.age = int.parse(ageController.text);
+    user.save();
+    setState(() {});
+  }
+
+  // DELETE
+  void deleteUser(int index) {
+    userBox.deleteAt(index);
+    setState(() {});
+  }
+
+  // LOAD DATA INTO FIELDS
+  void loadUser(int index) {
+    final user = userBox.getAt(index);
+    nameController.text = user!.name;
+    ageController.text = user.age.toString();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        title: const Text("Joke Generator"),
-        centerTitle: true,
-        backgroundColor: Colors.indigo,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Card(
-            elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+      appBar: AppBar(title: Text("Hive CRUD Example")),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(labelText: "Name"),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: isLoading
-                  ? const CircularProgressIndicator()
-                  : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    setup,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+            TextField(
+              controller: ageController,
+              decoration: InputDecoration(labelText: "Age"),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 10),
 
-                  // Eye toggle row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          showAnswer
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.indigo,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            showAnswer = !showAnswer;
-                          });
-                        },
-                      ),
-                      const Text("Show Answer"),
-                    ],
-                  ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(onPressed: addUser, child: Text("Add")),
+              ],
+            ),
 
-                  const SizedBox(height: 10),
+            SizedBox(height: 20),
 
-                  if (showAnswer)
-                    Text(
-                      punchline,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black87,
+            Expanded(
+              child: ListView.builder(
+                itemCount: userBox.length,
+                itemBuilder: (context, index) {
+                  final user = userBox.getAt(index);
+
+                  return Card(
+                    child: ListTile(
+                      title: Text(user!.name),
+                      subtitle: Text("Age: ${user.age}"),
+                      onTap: () => loadUser(index),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => updateUser(index),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () => deleteUser(index),
+                          ),
+                        ],
                       ),
                     ),
-
-                  const SizedBox(height: 30),
-
-                  ElevatedButton(
-                    onPressed: fetchJoke,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal, // changed color
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text("New Joke"),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
