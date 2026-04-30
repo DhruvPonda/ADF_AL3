@@ -1,41 +1,56 @@
-# 📱 ALA2 – Android Development Framework
-## 🎯 Joke Generator App (Flutter)
+# 📱 ALA3 – Android Development Framework
 
-**Name:** Dhruv Ponda  
-**Enrollment No.:** 20230905090049
+## 🎯 Hive CRUD Application (Flutter)
+
+---
+
+## 👤 Student Details
+- **Name:** Dhruv Ponda  
+- **Enrollment No.:** 20230905090049  
 
 ---
 
 ## 📌 Project Description
 
-This project is developed as part of **ALA2 – Android Development Framework**.  
-The application is a **Joke Generator App** built using **Flutter** and **Dart**.
+This project is a Flutter-based mobile application demonstrating **CRUD (Create, Read, Update, Delete)** operations using **Hive Database**, a lightweight and fast local storage solution.
 
-The app fetches random jokes from a public API and displays:
+The app allows users to:
+- Add user details (Name and Age)
+- View stored data in a list
+- Update existing records
+- Delete records from local storage
 
-- Joke setup
-- Hidden punchline (toggle visibility)
-- Button to fetch a new joke
-
-The project demonstrates understanding of:
-
-- Flutter architecture
-- Stateful widgets
-- HTTP networking
-- API integration
-- JSON parsing
-- UI design using Material components
+Hive is used for efficient data persistence without requiring a backend, making it ideal for offline-first applications.
 
 ---
 
-## 📸 Application Screenshots
+## 🔹 Screenshot 1 – Application UI
 
-### 🔹 Screenshot 1 – Application UI
+![Application UI](image.png)
 
-<img width="2559" height="1439" alt="Screenshot 2026-02-24 235649" src="https://github.com/user-attachments/assets/cc99547f-3513-4fb2-9b56-73a3cc2cb2b2" />
+> 📌 Replace `image.png` with your actual uploaded screenshot filename in your repository.
 
 ---
 
-### 🔹 Screenshot 2 – Working Output
+## ⚙️ Technologies Used
+- Flutter  
+- Dart  
+- Hive (Local Database)  
+- hive_flutter  
 
-<img width="2559" height="1439" alt="Screenshot 2026-02-24 235704" src="https://github.com/user-attachments/assets/5a46e225-c9a0-43b1-8173-3468ade1c3c8" />
+---
+
+## ✨ Features
+- 📥 Add user data  
+- 📋 Display list of users  
+- ✏️ Update existing user  
+- 🗑️ Delete user  
+- ⚡ Fast local storage using Hive  
+
+---
+
+## 🚀 How to Run the Project
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/your-repo-name.git
