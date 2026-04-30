@@ -26,7 +26,8 @@ Hive is used for efficient data persistence without requiring a backend, making 
 
 ## 🔹 Screenshot 1 – Application UI
 
-![Application UI](image.png)
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/8c658d23-79ed-481d-900e-dd3f142318ab" />
+
 
 > 📌 Replace `image.png` with your actual uploaded screenshot filename in your repository.
 
